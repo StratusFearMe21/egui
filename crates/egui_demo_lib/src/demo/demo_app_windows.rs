@@ -78,6 +78,7 @@ impl Default for DemoGroups {
                 Box::<super::multi_touch::MultiTouch>::default(),
                 Box::<super::painting::Painting>::default(),
                 Box::<super::panels::Panels>::default(),
+                Box::<super::popups::PopupsDemo>::default(),
                 Box::<super::scene::SceneDemo>::default(),
                 Box::<super::screenshot::Screenshot>::default(),
                 Box::<super::scrolling::Scrolling>::default(),
@@ -233,7 +234,7 @@ impl DemoWindows {
                     ui.set_style(ui.ctx().style()); // ignore the "menu" style set by `menu_button`.
                     self.demo_list_ui(ui);
                     if ui.ui_contains_pointer() && ui.input(|i| i.pointer.any_click()) {
-                        ui.close_menu();
+                        ui.close();
                     }
                 });
 
@@ -344,7 +345,7 @@ fn file_menu_button(ui: &mut Ui) {
             .clicked()
         {
             ui.ctx().memory_mut(|mem| mem.reset_areas());
-            ui.close_menu();
+            ui.close();
         }
 
         if ui
@@ -356,7 +357,7 @@ fn file_menu_button(ui: &mut Ui) {
             .clicked()
         {
             ui.ctx().memory_mut(|mem| *mem = Default::default());
-            ui.close_menu();
+            ui.close();
         }
     });
 }

@@ -1,3 +1,5 @@
+use egui::{ComboBox, Popup};
+
 #[derive(Clone, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct ContextMenus {}
@@ -32,6 +34,20 @@ impl crate::View for ContextMenus {
             }
         });
 
+        ui.horizontal(|ui| {
+            let response = ui.button("New menu");
+            Popup::menu(&response).show(Self::nested_menus);
+
+            let response = ui.button("New context menu");
+            Popup::context_menu(&response).show(Self::nested_menus);
+
+            ComboBox::new("Hi", "Hi").show_ui(ui, |ui| {
+                _ = ui.selectable_label(false, "I have some long text that should be wrapped");
+                _ = ui.selectable_label(false, "Short");
+                _ = ui.selectable_label(false, "Medium length");
+            });
+        });
+
         ui.vertical_centered(|ui| {
             ui.add(crate::egui_github_link_file!());
         });
@@ -43,24 +59,25 @@ impl ContextMenus {
         ui.set_max_width(200.0); // To make sure we wrap long text
 
         if ui.button("Open…").clicked() {
-            ui.close_menu();
+            ui.close();
         }
         ui.menu_button("SubMenu", |ui| {
             ui.menu_button("SubMenu", |ui| {
                 if ui.button("Open…").clicked() {
-                    ui.close_menu();
+                    ui.close();
                 }
                 let _ = ui.button("Item");
+                ui.menu_button("Recursive", Self::nested_menus)
             });
             ui.menu_button("SubMenu", |ui| {
                 if ui.button("Open…").clicked() {
-                    ui.close_menu();
+                    ui.close();
                 }
                 let _ = ui.button("Item");
             });
             let _ = ui.button("Item");
             if ui.button("Open…").clicked() {
-                ui.close_menu();
+                ui.close();
             }
         });
         ui.menu_button("SubMenu", |ui| {
@@ -69,7 +86,7 @@ impl ContextMenus {
             let _ = ui.button("Item3");
             let _ = ui.button("Item4");
             if ui.button("Open…").clicked() {
-                ui.close_menu();
+                ui.close();
             }
         });
         let _ = ui.button("Very long text for this item that should be wrapped");
