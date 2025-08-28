@@ -19,13 +19,13 @@ impl File {
                     return Err(format!(
                         "failed to load {uri:?}: {} {} {response_text}",
                         response.status, response.status_text
-                    ))
+                    ));
                 }
                 None => {
                     return Err(format!(
                         "failed to load {uri:?}: {} {}",
                         response.status, response.status_text
-                    ))
+                    ));
                 }
             }
         }
@@ -94,9 +94,19 @@ impl BytesLoader for EhttpLoader {
                             Err(format!("Failed to load {uri:?}"))
                         }
                     };
-                    log::trace!("finished loading {uri:?}");
-                    cache.lock().insert(uri, Poll::Ready(result));
-                    ctx.request_repaint();
+                    let mut cache = cache.lock();
+                    if let std::collections::hash_map::Entry::Occupied(mut entry) =
+                        cache.entry(uri.clone())
+                    {
+                        let entry = entry.get_mut();
+                        *entry = Poll::Ready(result);
+                        ctx.request_repaint();
+                        log::trace!("Finished loading {uri:?}");
+                    } else {
+                        log::trace!(
+                            "Canceled loading {uri:?}\nNote: This can happen if `forget_image` is called while the image is still loading."
+                        );
+                    }
                 }
             });
 
@@ -124,5 +134,9 @@ impl BytesLoader for EhttpLoader {
                 _ => 0,
             })
             .sum()
+    }
+
+    fn has_pending(&self) -> bool {
+        self.cache.lock().values().any(|entry| entry.is_pending())
     }
 }

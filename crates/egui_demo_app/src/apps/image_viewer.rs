@@ -1,9 +1,9 @@
-use egui::emath::Rot2;
-use egui::panel::Side;
-use egui::panel::TopBottomSide;
 use egui::ImageFit;
 use egui::Slider;
 use egui::Vec2;
+use egui::emath::Rot2;
+use egui::panel::Side;
+use egui::panel::TopBottomSide;
 
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct ImageViewer {
@@ -61,7 +61,7 @@ impl eframe::App for ImageViewer {
                     ctx.forget_image(&self.current_uri);
                     self.uri_edit_text = self.uri_edit_text.trim().to_owned();
                     self.current_uri = self.uri_edit_text.clone();
-                };
+                }
 
                 #[cfg(not(target_arch = "wasm32"))]
                 if ui.button("file…").clicked() {
